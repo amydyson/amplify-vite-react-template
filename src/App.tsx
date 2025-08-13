@@ -2,18 +2,27 @@ import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { useAuthenticator } from "@aws-amplify/ui-react";
+import { fetchUserAttributes } from "aws-amplify/auth";
 
 const client = generateClient<Schema>();
 
 function App() {
   const { user, signOut } = useAuthenticator();
   const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const [userAttributes, setUserAttributes] = useState<any>(null);
 
   useEffect(() => {
     client.models.Todo.observeQuery().subscribe({
       next: (data) => setTodos([...data.items]),
     });
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchUserAttributes().then(setUserAttributes);
+    }
+  }, [user]);
+  console.log("User attributes:", userAttributes);
 
   function createTodo() {
     client.models.Todo.create({ content: window.prompt("Todo content") });
@@ -25,7 +34,7 @@ function App() {
 
   return (
     <main>
-      <h1>{user?.signInDetails?.loginId}'s todos</h1>
+      <h1>{userAttributes?.given_name}'s todos</h1>
       <button onClick={createTodo}>+ new</button>
       <ul>
         {todos.map((todo) => (

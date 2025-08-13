@@ -11,7 +11,10 @@ Amplify.configure(outputs);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Authenticator>
+    <Authenticator
+      signUpAttributes={["email", "phone_number", "given_name", "family_name"]}
+      loginMechanisms={["email", "phone_number"]}
+    >
       <App />
     </Authenticator>
   </React.StrictMode>
